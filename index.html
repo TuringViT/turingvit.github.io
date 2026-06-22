@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>TuringViT · Making SOTA Vision Transformers Accessible to All</title>
+<meta name="description" content="A VLM-native, data-efficient and linear-complexity Vision Transformer designed for native-resolution Vision-Language Models. Making SOTA visual encoders trainable under controlled resource budgets." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/main.css" />
+</head>
+<body>
+
+<!-- ========== Background Layers ========== -->
+<canvas id="bg-canvas" class="bg-canvas"></canvas>
+<div class="bg-grid"></div>
+<div class="bg-glow glow-a"></div>
+<div class="bg-glow glow-b"></div>
+<div class="bg-noise"></div>
+
+<!-- ========== Top Nav ========== -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="#top">
+      <span class="brand-mark">
+        <svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true">
+          <defs>
+            <linearGradient id="gMark" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0" stop-color="#7af9ff"/>
+              <stop offset="1" stop-color="#c66bff"/>
+            </linearGradient>
+          </defs>
+          <rect x="3" y="3" width="26" height="26" rx="7" fill="none" stroke="url(#gMark)" stroke-width="2"/>
+          <path d="M9 16h14 M16 9v14" stroke="url(#gMark)" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="16" cy="16" r="3" fill="url(#gMark)"/>
+        </svg>
+      </span>
+      <span class="brand-text">Turing<span class="brand-accent">ViT</span></span>
+    </a>
+    <div class="nav-links">
+      <a href="#pillars">Pillars</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#latency">Latency</a>
+      <a href="#data">Data</a>
+      <a href="#training">Training</a>
+      <a href="#results">Results</a>
+    </div>
+    <div class="nav-cta">
+      <a class="btn btn-primary" href="#paper">Technical Report</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ========== Hero ========== -->
+<header id="top" class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">
+      <span class="dot"></span>
+      <span>Technical Report · XPeng Foundation Model Team</span>
+    </div>
+
+    <h1 class="hero-title">
+      <span class="hero-line">
+        <span class="grad-text">Turing</span><span class="hero-vit">ViT</span>
+      </span>
+      <span class="hero-sub">
+        Making <em>SOTA</em> Vision Transformers <em>Accessible</em> to All
+      </span>
+    </h1>
+
+    <p class="hero-lede">
+      A <b>VLM-native</b>, <b>data-efficient</b> and <b>linear-complexity</b> Vision Transformer.
+      We show a concrete, reproducible path for designing and training your own SOTA-level visual encoder
+      under a controlled resource budget &mdash; outperforming leading open-source ViT baselines using
+      only <b>10% of the data</b>, with substantially flatter latency scaling for high-resolution and dynamic-resolution inputs.
+    </p>
+
+    <div class="hero-stats">
+      <div class="stat">
+        <span class="stat-num" data-count="3.3" data-suffix="×">0×</span>
+        <span class="stat-lbl">faster at 1024² inputs</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num" data-count="10" data-suffix="%">0%</span>
+        <span class="stat-lbl">of baseline data</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num" data-count="83.6" data-suffix="">0</span>
+        <span class="stat-lbl">avg. zero-shot acc.</span>
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <a class="btn btn-primary lg" href="#architecture">
+        Explore the Design
+        <svg viewBox="0 0 24 24" width="16" height="16"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a class="btn btn-ghost lg" href="#latency">See Latency Demo</a>
+    </div>
+
+    <div class="hero-scroll" aria-hidden="true">
+      <span>scroll</span>
+      <div class="scroll-bar"><i></i></div>
+    </div>
+  </div>
+</header>
+
+<!-- ========== 3 Pillars ========== -->
+<section id="pillars" class="section pillars">
+  <div class="section-head">
+    <span class="kicker">Three Coordinated Designs</span>
+    <h2>One ViT, designed end-to-end for the <span class="grad-text">VLM era</span>.</h2>
+    <p>TuringViT rethinks visual encoders along three orthogonal axes — architecture, data, and training — to make SOTA-level encoders trainable and customizable under realistic resource budgets.</p>
+  </div>
+
+  <div class="pillar-grid">
+    <article class="pillar tilt">
+      <div class="pillar-icon">
+        <svg viewBox="0 0 48 48" width="40" height="40"><defs><linearGradient id="pa" x1="0" x2="1"><stop offset="0" stop-color="#7af9ff"/><stop offset="1" stop-color="#5eead4"/></linearGradient></defs><path d="M6 24h36M6 14h36M6 34h36" stroke="url(#pa)" stroke-width="2" stroke-linecap="round"/><circle cx="14" cy="14" r="3" fill="url(#pa)"/><circle cx="28" cy="24" r="3" fill="url(#pa)"/><circle cx="38" cy="34" r="3" fill="url(#pa)"/></svg>
+      </div>
+      <h3>Architecture-Efficient</h3>
+      <p>The <b>Turing Linear Attention (TLA)</b> dominates the stack; only 1 of every 6 layers keeps softmax MHA for global routing. Quadratic → near-linear scaling, with input-dependent gating that preserves local & high-frequency cues.</p>
+      <ul class="pillar-meta">
+        <li><span>5× TLA + 1× MHA</span></li>
+        <li><span>2D-RoPE</span></li>
+        <li><span>RMSNorm + SwiGLU</span></li>
+      </ul>
+    </article>
+
+    <article class="pillar tilt">
+      <div class="pillar-icon">
+        <svg viewBox="0 0 48 48" width="40" height="40"><defs><linearGradient id="pb" x1="0" x2="1"><stop offset="0" stop-color="#c66bff"/><stop offset="1" stop-color="#7af9ff"/></linearGradient></defs><path d="M10 36V18l14-8 14 8v18l-14 8-14-8z" stroke="url(#pb)" stroke-width="2" fill="none" stroke-linejoin="round"/><path d="M10 18l14 8 14-8M24 26v18" stroke="url(#pb)" stroke-width="2" fill="none" stroke-linejoin="round"/></svg>
+      </div>
+      <h3>Data-Efficient</h3>
+      <p><b>VISTA-Curation</b> turns noisy web image–text and video–text data into grounded, discriminative, temporally informative supervision. Result: <b>10×</b> data reduction without sacrificing quality.</p>
+      <ul class="pillar-meta">
+        <li><span>multi-candidate recap</span></li>
+        <li><span>relative scoring</span></li>
+        <li><span>temporal aggregation</span></li>
+      </ul>
+    </article>
+
+    <article class="pillar tilt">
+      <div class="pillar-icon">
+        <svg viewBox="0 0 48 48" width="40" height="40"><defs><linearGradient id="pc" x1="0" x2="1"><stop offset="0" stop-color="#ffd166"/><stop offset="1" stop-color="#c66bff"/></linearGradient></defs><rect x="6" y="10" width="20" height="14" rx="2" stroke="url(#pc)" stroke-width="2" fill="none"/><rect x="10" y="26" width="32" height="14" rx="2" stroke="url(#pc)" stroke-width="2" fill="none"/><path d="M30 14h8M30 18h6" stroke="url(#pc)" stroke-width="2" stroke-linecap="round"/></svg>
+      </div>
+      <h3>VLM-Native</h3>
+      <p>Trained natively at <b>dynamic resolution</b> from the start; no post-hoc adaptation, no extra parameters when plugged into downstream VLMs. Generation-aligned objectives further bridge contrastive ViT and generative VLM training.</p>
+      <ul class="pillar-meta">
+        <li><span>progressive res. schedule</span></li>
+        <li><span>plug-and-play</span></li>
+        <li><span>generation alignment</span></li>
+      </ul>
+    </article>
+  </div>
+</section>
+
+<!-- ========== Architecture ========== -->
+<section id="architecture" class="section architecture">
+  <div class="section-head">
+    <span class="kicker">Architecture</span>
+    <h2>The <span class="grad-text">Turing Block</span> &mdash; five sprints of linear attention, one global stride.</h2>
+    <p>Linear attention does the heavy lifting; sparse vanilla MHA preserves explicit token-to-token interaction.</p>
+  </div>
+
+  <div class="arch-figure-full">
+    <img src="assets/figures/structure.png" alt="TuringViT structure: hybrid linear attention backbone" loading="lazy"/>
+  </div>
+
+  <div class="arch-variants-row">
+    <div class="variant">
+      <div class="var-name">TuringViT-<b>18L</b><span class="muted">3 Turing Blocks</span></div>
+      <div class="var-bars">
+        <span class="bar tla" style="--w:83%"><i>15× TLA</i></span>
+        <span class="bar mha" style="--w:17%"><i>3× MHA</i></span>
+      </div>
+      <div class="var-meta">Efficient & deployment-friendly under dynamic-resolution inputs.</div>
+    </div>
+    <div class="variant">
+      <div class="var-name">TuringViT-<b>24L</b><span class="muted">4 Turing Blocks</span></div>
+      <div class="var-bars">
+        <span class="bar tla" style="--w:83%"><i>20× TLA</i></span>
+        <span class="bar mha" style="--w:17%"><i>4× MHA</i></span>
+      </div>
+      <div class="var-meta">Stronger representation, computation still dominated by linear attention.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== Latency ========== -->
+<section id="latency" class="section latency">
+  <div class="section-head">
+    <span class="kicker">Linear Scaling</span>
+    <h2>The longer the sequence, the wider the gap.</h2>
+    <p>Drag the slider to feed more visual tokens into each model. Watch standard ViTs explode while TuringViT stays flat.</p>
+  </div>
+
+  <div class="latency-stage glass">
+    <div class="latency-controls">
+      <div class="ctrl">
+        <label>Visual tokens</label>
+        <div class="slider-row">
+          <input id="seqSlider" type="range" min="256" max="16384" step="128" value="4096"/>
+          <output id="seqValue">4096</output>
+        </div>
+      </div>
+      <div class="ctrl">
+        <label>Resolution preset</label>
+        <div class="presets">
+          <button class="preset" data-seq="256">224²</button>
+          <button class="preset" data-seq="1024">512²</button>
+          <button class="preset active" data-seq="4096">1024²</button>
+          <button class="preset" data-seq="9216">1536²</button>
+          <button class="preset" data-seq="16384">2048²</button>
+        </div>
+      </div>
+    </div>
+
+    <canvas id="latencyChart" class="latency-canvas"></canvas>
+
+    <div class="latency-readout">
+      <div class="rd rd-vit">
+        <div class="rd-name"><span class="dot vit"></span>Vanilla ViT</div>
+        <div class="rd-num"><span id="vitMs">—</span><em>ms</em></div>
+        <div class="rd-bar"><i id="vitBar"></i></div>
+      </div>
+      <div class="rd rd-tv">
+        <div class="rd-name"><span class="dot tv"></span>TuringViT</div>
+        <div class="rd-num"><span id="tvMs">—</span><em>ms</em></div>
+        <div class="rd-bar"><i id="tvBar"></i></div>
+      </div>
+      <div class="rd rd-speed">
+        <div class="rd-name">Speedup</div>
+        <div class="rd-num"><span id="speedup">—</span><em>×</em></div>
+        <div class="rd-hint">at current sequence length</div>
+      </div>
+    </div>
+
+    <p class="latency-note">
+      Curves are illustrative — based on the asymptotic <code>O(N²)</code> vs. <code>O(N)</code> behavior reported in the paper. See Fig. 1 in the manuscript for measured numbers.
+    </p>
+  </div>
+</section>
+
+<!-- ========== Data: VISTA-Curation ========== -->
+<section id="data" class="section data">
+  <div class="section-head">
+    <span class="kicker">VISTA-Curation</span>
+    <h2>More <span class="grad-text">supervision per sample</span>, not more samples.</h2>
+    <p>Vision Data Curation via Image–Video <b>S</b>coring and <b>T</b>emporal <b>A</b>ggregation. Each sample is filtered, recaptioned, scored, grounded, and (for video) temporally aggregated &mdash; turning noisy web data into denser supervision.</p>
+  </div>
+
+  <div class="data-figs-stack">
+    <figure class="glass">
+      <img src="assets/figures/datav7.png" alt="VISTA-Curation image pipeline" loading="lazy"/>
+      <figcaption>Image data curation pipeline</figcaption>
+    </figure>
+    <figure class="glass">
+      <img src="assets/figures/video_caption_method_diagram_hd.png" alt="Video caption method" loading="lazy"/>
+      <figcaption>Video caption · temporal aggregation</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ========== Training Stages ========== -->
+<section id="training" class="section nativeres">
+  <div class="section-head">
+    <span class="kicker">Pre-training Recipe</span>
+    <h2>A four-stage progressive recipe, <span class="grad-text">native to VLM usage</span>.</h2>
+    <p>The goal is not to introduce complex objectives, but to progressively expose the encoder to the same inputs downstream VLMs see &mdash; dynamic-resolution images, high-resolution visual content, and mixed image–video data. Both 18L and 24L follow the same recipe.</p>
+  </div>
+
+  <div class="stages-grid">
+    <article class="stage-card">
+      <span class="stage-no">STAGE 01</span>
+      <h4>MIM-based Visual Initialization</h4>
+      <p>Reconstruct masked EVA02-CLIP-E features (40% mask rate) to bootstrap geometric priors before language alignment.</p>
+      <div class="stage-progress"><i style="--p:18%"></i></div>
+      <dl class="stage-meta">
+        <dt>data</dt><dd>55M images</dd>
+        <dt>res.</dt><dd>256²</dd>
+        <dt>obj.</dt><dd>MIM distill.</dd>
+        <dt>cost</dt><dd>9,984 H800h</dd>
+      </dl>
+    </article>
+
+    <article class="stage-card">
+      <span class="stage-no">STAGE 02</span>
+      <h4>Bounded Dynamic Image–Text</h4>
+      <p>Aspect-preserving dynamic resolution with longer side &isin; [256, 512]; SigLIP + SuperClass loss for large-scale alignment.</p>
+      <div class="stage-progress"><i style="--p:55%"></i></div>
+      <dl class="stage-meta">
+        <dt>data</dt><dd>850M pairs</dd>
+        <dt>res.</dt><dd>bounded dyn.</dd>
+        <dt>obj.</dt><dd>contrastive</dd>
+        <dt>cost</dt><dd>30,720 H800h</dd>
+      </dl>
+    </article>
+
+    <article class="stage-card">
+      <span class="stage-no">STAGE 03</span>
+      <h4>High-Resolution Refinement</h4>
+      <p>Cap longer side at 2048, covering nearly all native-resolution images. Sharpens local detail for OCR / charts / GUI inputs.</p>
+      <div class="stage-progress"><i style="--p:80%"></i></div>
+      <dl class="stage-meta">
+        <dt>data</dt><dd>850M pairs</dd>
+        <dt>res.</dt><dd>unrestricted dyn.</dd>
+        <dt>obj.</dt><dd>contrastive</dd>
+        <dt>cost</dt><dd>12,288 H800h</dd>
+      </dl>
+    </article>
+
+    <article class="stage-card">
+      <span class="stage-no">STAGE 04</span>
+      <h4>Image–Video Mixed Training</h4>
+      <p>Mix video–text with image–text replay. T=8 frames → attention-pool → mean-pool video embedding aligned via L<sub>VT</sub>.</p>
+      <div class="stage-progress"><i style="--p:100%"></i></div>
+      <dl class="stage-meta">
+        <dt>data</dt><dd>2M video + replay</dd>
+        <dt>res.</dt><dd>unrestricted dyn.</dd>
+        <dt>obj.</dt><dd>L<sub>IT</sub> + λ·L<sub>VT</sub></dd>
+        <dt>cost</dt><dd>460 H800h</dd>
+      </dl>
+    </article>
+  </div>
+</section>
+
+<!-- ========== Results ========== -->
+<section id="results" class="section results">
+  <div class="section-head">
+    <span class="kicker">Results</span>
+    <h2>Stronger backbone, smaller data, faster inference.</h2>
+  </div>
+
+  <div class="result-grid">
+    <div class="result-card glass">
+      <div class="rc-num"><span data-count="83.9" data-suffix="">0</span></div>
+      <div class="rc-lbl">ImageNet-1K · zero-shot</div>
+      <div class="rc-hint">TuringViT-24L · vs. SigLIP2-L 83.1</div>
+    </div>
+    <div class="result-card glass">
+      <div class="rc-num"><span data-count="89.7" data-suffix="">0</span></div>
+      <div class="rc-lbl">ImageNet-A</div>
+      <div class="rc-hint">+5.4 over SigLIP2-L (84.3)</div>
+    </div>
+    <div class="result-card glass">
+      <div class="rc-num"><span data-count="78.9" data-suffix="">0</span></div>
+      <div class="rc-lbl">Zero-shot retrieval avg.</div>
+      <div class="rc-hint">COCO + Flickr30K bidirectional</div>
+    </div>
+    <div class="result-card glass">
+      <div class="rc-num"><span data-count="0.85" data-suffix="B">0</span></div>
+      <div class="rc-lbl">Pretraining samples</div>
+      <div class="rc-hint">vs. 10B for SigLIP2-L</div>
+    </div>
+  </div>
+
+  <div class="results-compare glass">
+    <h3>Architecture & data side-by-side</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th></th><th>Encoder</th><th>Resolution</th><th>Data</th><th>IN-1K</th><th>IN-A</th><th>Avg. cls.</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="row-tag">SigLIP-B</td><td>0.1B</td><td>224</td><td>10B</td><td>76.2</td><td>45.1</td><td>69.9</td></tr>
+          <tr><td class="row-tag">SigLIP2-B</td><td>0.1B</td><td>224</td><td>10B</td><td>78.2</td><td>55.0</td><td>73.1</td></tr>
+          <tr><td class="row-tag">SigLIP-L</td><td>0.3B</td><td>384</td><td>10B</td><td>82.1</td><td>76.5</td><td>80.7</td></tr>
+          <tr><td class="row-tag">SigLIP2-L</td><td>0.3B</td><td>384</td><td>10B</td><td>83.1</td><td>84.3</td><td>83.3</td></tr>
+          <tr class="row-ours"><td class="row-tag tag-ours">TuringViT-18L</td><td>0.3B</td><td>dyn.</td><td><b>0.85B</b></td><td>83.11</td><td>87.88</td><td>82.40</td></tr>
+          <tr class="row-ours"><td class="row-tag tag-ours">TuringViT-24L</td><td>0.5B</td><td>dyn.</td><td><b>0.85B</b></td><td><b>83.90</b></td><td><b>89.72</b></td><td><b>83.60</b></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ========== Footer ========== -->
+<footer id="paper" class="footer">
+  <div class="footer-inner">
+    <div class="foot-brand">
+      <div class="brand">
+        <span class="brand-mark">
+          <svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true">
+            <defs>
+              <linearGradient id="gMarkF" x1="0" x2="1" y1="0" y2="1">
+                <stop offset="0" stop-color="#7af9ff"/>
+                <stop offset="1" stop-color="#c66bff"/>
+              </linearGradient>
+            </defs>
+            <rect x="3" y="3" width="26" height="26" rx="7" fill="none" stroke="url(#gMarkF)" stroke-width="2"/>
+            <path d="M9 16h14 M16 9v14" stroke="url(#gMarkF)" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="16" cy="16" r="3" fill="url(#gMarkF)"/>
+          </svg>
+        </span>
+        <span class="brand-text">Turing<span class="brand-accent">ViT</span></span>
+      </div>
+      <p>Foundation Model Team, XPeng · Technical Report</p>
+    </div>
+
+    <div class="foot-links">
+      <a href="#architecture">Architecture</a>
+      <a href="#data">Data</a>
+      <a href="#training">Training</a>
+      <a href="#results">Results</a>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <span>© 2025 TuringViT</span>
+    <span class="muted">Crafted with care · Static page · No tracking</span>
+  </div>
+</footer>
+
+<script src="scripts/background.js" defer></script>
+<script src="scripts/latency.js" defer></script>
+<script src="scripts/main.js" defer></script>
+</body>
+</html>
