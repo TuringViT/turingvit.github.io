@@ -24,17 +24,7 @@
   <div class="nav-inner">
     <a class="brand" href="#top">
       <span class="brand-mark">
-        <svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true">
-          <defs>
-            <linearGradient id="gMark" x1="0" x2="1" y1="0" y2="1">
-              <stop offset="0" stop-color="#7af9ff"/>
-              <stop offset="1" stop-color="#c66bff"/>
-            </linearGradient>
-          </defs>
-          <rect x="3" y="3" width="26" height="26" rx="7" fill="none" stroke="url(#gMark)" stroke-width="2"/>
-          <path d="M9 16h14 M16 9v14" stroke="url(#gMark)" stroke-width="2" stroke-linecap="round"/>
-          <circle cx="16" cy="16" r="3" fill="url(#gMark)"/>
-        </svg>
+        <img src="assets/figures/logo.png" alt="TuringViT" class="brand-logo" />
       </span>
       <span class="brand-text">Turing<span class="brand-accent">ViT</span></span>
     </a>
@@ -78,8 +68,8 @@
 
     <div class="hero-stats">
       <div class="stat">
-        <span class="stat-num" data-count="3.3" data-suffix="×">0×</span>
-        <span class="stat-lbl">faster at 1024² inputs</span>
+        <span class="stat-num" data-count="3.04" data-suffix="×">0×</span>
+        <span class="stat-lbl">faster at 1536² vs seed1.5-vit</span>
       </div>
       <div class="stat">
         <span class="stat-num" data-count="10" data-suffix="%">0%</span>
@@ -87,7 +77,7 @@
       </div>
       <div class="stat">
         <span class="stat-num" data-count="83.6" data-suffix="">0</span>
-        <span class="stat-lbl">avg. zero-shot acc.</span>
+        <span class="stat-lbl">avg. zero-shot acc. (24L)</span>
       </div>
     </div>
 
@@ -160,8 +150,8 @@
 <section id="architecture" class="section architecture">
   <div class="section-head">
     <span class="kicker">Architecture</span>
-    <h2>The <span class="grad-text">Turing Block</span> &mdash; five sprints of linear attention, one global stride.</h2>
-    <p>Linear attention does the heavy lifting; sparse vanilla MHA preserves explicit token-to-token interaction.</p>
+    <h2>The <span class="grad-text">Turing Block</span> &mdash; linear where it matters, softmax where it counts.</h2>
+    <p>Five Turing Linear Attention layers handle global context at <b>O(N)</b>. One vanilla MHA per block keeps token-level precision. The result: latency stays flat as resolution climbs.</p>
   </div>
 
   <div class="arch-figure-full">
@@ -193,52 +183,13 @@
   <div class="section-head">
     <span class="kicker">Linear Scaling</span>
     <h2>The longer the sequence, the wider the gap.</h2>
-    <p>Drag the slider to feed more visual tokens into each model. Watch standard ViTs explode while TuringViT stays flat.</p>
+    <p>Standard ViTs scale quadratically with visual token count. TuringViT stays flat.</p>
   </div>
 
-  <div class="latency-stage glass">
-    <div class="latency-controls">
-      <div class="ctrl">
-        <label>Visual tokens</label>
-        <div class="slider-row">
-          <input id="seqSlider" type="range" min="256" max="16384" step="128" value="4096"/>
-          <output id="seqValue">4096</output>
-        </div>
-      </div>
-      <div class="ctrl">
-        <label>Resolution preset</label>
-        <div class="presets">
-          <button class="preset" data-seq="256">224²</button>
-          <button class="preset" data-seq="1024">512²</button>
-          <button class="preset active" data-seq="4096">1024²</button>
-          <button class="preset" data-seq="9216">1536²</button>
-          <button class="preset" data-seq="16384">2048²</button>
-        </div>
-      </div>
-    </div>
-
-    <canvas id="latencyChart" class="latency-canvas"></canvas>
-
-    <div class="latency-readout">
-      <div class="rd rd-vit">
-        <div class="rd-name"><span class="dot vit"></span>Vanilla ViT</div>
-        <div class="rd-num"><span id="vitMs">—</span><em>ms</em></div>
-        <div class="rd-bar"><i id="vitBar"></i></div>
-      </div>
-      <div class="rd rd-tv">
-        <div class="rd-name"><span class="dot tv"></span>TuringViT</div>
-        <div class="rd-num"><span id="tvMs">—</span><em>ms</em></div>
-        <div class="rd-bar"><i id="tvBar"></i></div>
-      </div>
-      <div class="rd rd-speed">
-        <div class="rd-name">Speedup</div>
-        <div class="rd-num"><span id="speedup">—</span><em>×</em></div>
-        <div class="rd-hint">at current sequence length</div>
-      </div>
-    </div>
-
+  <div class="latency-figure glass">
+    <img src="assets/figures/latency_scaling.png" alt="Inference latency scaling: TuringViT vs standard ViT baselines" loading="lazy"/>
     <p class="latency-note">
-      Curves are illustrative — based on the asymptotic <code>O(N²)</code> vs. <code>O(N)</code> behavior reported in the paper. See Fig. 1 in the manuscript for measured numbers.
+      Latency measured per image using FP16 TensorRT on an NVIDIA GeForce RTX 3080 Ti (CUDA 11.6). TuringViT shows flatter high-resolution scaling than standard ViT baselines.
     </p>
   </div>
 </section>
@@ -253,12 +204,12 @@
 
   <div class="data-figs-stack">
     <figure class="glass">
-      <img src="assets/figures/datav7.png" alt="VISTA-Curation image pipeline" loading="lazy"/>
-      <figcaption>Image data curation pipeline</figcaption>
+      <img src="assets/figures/datav9.png" alt="Image-language curation engine overview" loading="lazy"/>
+      <figcaption>Image-language curation engine</figcaption>
     </figure>
     <figure class="glass">
-      <img src="assets/figures/video_caption_method_diagram_hd.png" alt="Video caption method" loading="lazy"/>
-      <figcaption>Video caption · temporal aggregation</figcaption>
+      <img src="assets/figures/videov4.png" alt="Video-language data curation pipeline" loading="lazy"/>
+      <figcaption>Video-language data curation pipeline</figcaption>
     </figure>
   </div>
 </section>
@@ -293,7 +244,7 @@
       <dl class="stage-meta">
         <dt>data</dt><dd>850M pairs</dd>
         <dt>res.</dt><dd>bounded dyn.</dd>
-        <dt>obj.</dt><dd>contrastive</dd>
+        <dt>obj.</dt><dd>SigLIP + SuperClass</dd>
         <dt>cost</dt><dd>30,720 H800h</dd>
       </dl>
     </article>
@@ -301,12 +252,12 @@
     <article class="stage-card">
       <span class="stage-no">STAGE 03</span>
       <h4>High-Resolution Refinement</h4>
-      <p>Cap longer side at 2048, covering nearly all native-resolution images. Sharpens local detail for OCR / charts / GUI inputs.</p>
+      <p>Preserve original aspect ratio &amp; resolution whenever possible, making visual preprocessing consistent with downstream VLM usage.</p>
       <div class="stage-progress"><i style="--p:80%"></i></div>
       <dl class="stage-meta">
         <dt>data</dt><dd>850M pairs</dd>
         <dt>res.</dt><dd>unrestricted dyn.</dd>
-        <dt>obj.</dt><dd>contrastive</dd>
+        <dt>obj.</dt><dd>SigLIP + SuperClass</dd>
         <dt>cost</dt><dd>12,288 H800h</dd>
       </dl>
     </article>
@@ -319,7 +270,7 @@
       <dl class="stage-meta">
         <dt>data</dt><dd>2M video + replay</dd>
         <dt>res.</dt><dd>unrestricted dyn.</dd>
-        <dt>obj.</dt><dd>L<sub>IT</sub> + λ·L<sub>VT</sub></dd>
+        <dt>obj.</dt><dd>SigLIP + SuperClass</dd>
         <dt>cost</dt><dd>460 H800h</dd>
       </dl>
     </article>
@@ -345,9 +296,9 @@
       <div class="rc-hint">+5.4 over SigLIP2-L (84.3)</div>
     </div>
     <div class="result-card glass">
-      <div class="rc-num"><span data-count="78.9" data-suffix="">0</span></div>
+      <div class="rc-num"><span data-count="79.4" data-suffix="">0</span></div>
       <div class="rc-lbl">Zero-shot retrieval avg.</div>
-      <div class="rc-hint">COCO + Flickr30K bidirectional</div>
+      <div class="rc-hint">TuringViT-24L · COCO + Flickr30K</div>
     </div>
     <div class="result-card glass">
       <div class="rc-num"><span data-count="0.85" data-suffix="B">0</span></div>
@@ -357,19 +308,37 @@
   </div>
 
   <div class="results-compare glass">
-    <h3>Architecture & data side-by-side</h3>
+    <h3>Zero-shot performance across classification &amp; retrieval</h3>
     <div class="table-wrap">
       <table>
         <thead>
-          <tr><th></th><th>Encoder</th><th>Resolution</th><th>Data</th><th>IN-1K</th><th>IN-A</th><th>Avg. cls.</th></tr>
+          <tr>
+            <th></th>
+            <th>MobileCLIP2-L</th>
+            <th>SigLIP2-L</th>
+            <th>Seed1.5-ViT</th>
+            <th>TuringViT-18L</th>
+            <th>TuringViT-24L</th>
+          </tr>
         </thead>
         <tbody>
-          <tr><td class="row-tag">SigLIP-B</td><td>0.1B</td><td>224</td><td>10B</td><td>76.2</td><td>45.1</td><td>69.9</td></tr>
-          <tr><td class="row-tag">SigLIP2-B</td><td>0.1B</td><td>224</td><td>10B</td><td>78.2</td><td>55.0</td><td>73.1</td></tr>
-          <tr><td class="row-tag">SigLIP-L</td><td>0.3B</td><td>384</td><td>10B</td><td>82.1</td><td>76.5</td><td>80.7</td></tr>
-          <tr><td class="row-tag">SigLIP2-L</td><td>0.3B</td><td>384</td><td>10B</td><td>83.1</td><td>84.3</td><td>83.3</td></tr>
-          <tr class="row-ours"><td class="row-tag tag-ours">TuringViT-18L</td><td>0.3B</td><td>dyn.</td><td><b>0.85B</b></td><td>83.11</td><td>87.88</td><td>82.40</td></tr>
-          <tr class="row-ours"><td class="row-tag tag-ours">TuringViT-24L</td><td>0.5B</td><td>dyn.</td><td><b>0.85B</b></td><td><b>83.90</b></td><td><b>89.72</b></td><td><b>83.60</b></td></tr>
+          <tr class="row-section"><td colspan="6">Model configuration</td></tr>
+          <tr><td class="row-tag">Resolution</td><td>224</td><td>384</td><td>dyn.</td><td>dyn.</td><td>dyn.</td></tr>
+          <tr><td class="row-tag">Pretraining data</td><td>1.9B</td><td>10B</td><td>4.8B</td><td><b>0.85B</b></td><td><b>0.85B</b></td></tr>
+          <tr class="row-section"><td colspan="6">Zero-shot classification</td></tr>
+          <tr><td class="row-tag"><b>Avg</b></td><td>77.1</td><td>83.4</td><td>82.5</td><td>82.7</td><td><b>83.6</b></td></tr>
+          <tr><td class="row-tag">ImageNet-1K</td><td>81.9</td><td>83.1</td><td>83.6</td><td>83.1</td><td><b>83.9</b></td></tr>
+          <tr><td class="row-tag">ImageNet-v2</td><td>74.7</td><td>77.4</td><td>77.6</td><td>77.6</td><td><b>78.0</b></td></tr>
+          <tr><td class="row-tag">ObjectNet</td><td>75.3</td><td><b>84.4</b></td><td>79.2</td><td>79.7</td><td>81.1</td></tr>
+          <tr><td class="row-tag">ImageNet-A</td><td>69.0</td><td>84.3</td><td>85.5</td><td>87.9</td><td><b>89.7</b></td></tr>
+          <tr><td class="row-tag">ImageNet-R</td><td>91.7</td><td><b>95.7</b></td><td>95.2</td><td>95.0</td><td>95.3</td></tr>
+          <tr><td class="row-tag">ImageNet-Sketch</td><td>69.8</td><td><b>75.5</b></td><td>74.1</td><td>72.8</td><td>73.6</td></tr>
+          <tr class="row-section"><td colspan="6">Zero-shot retrieval</td></tr>
+          <tr><td class="row-tag"><b>Avg</b></td><td>72.5</td><td>76.7</td><td>&mdash;</td><td>78.9</td><td><b>79.4</b></td></tr>
+          <tr><td class="row-tag">COCO T&rarr;I</td><td>51.6</td><td>55.3</td><td>&mdash;</td><td>58.6</td><td><b>59.4</b></td></tr>
+          <tr><td class="row-tag">COCO I&rarr;T</td><td>69.0</td><td>71.4</td><td>&mdash;</td><td>75.9</td><td><b>76.0</b></td></tr>
+          <tr><td class="row-tag">Flickr30K T&rarr;I</td><td>77.2</td><td>85.0</td><td>&mdash;</td><td>85.7</td><td><b>86.0</b></td></tr>
+          <tr><td class="row-tag">Flickr30K I&rarr;T</td><td>92.0</td><td>95.2</td><td>&mdash;</td><td>95.3</td><td><b>96.3</b></td></tr>
         </tbody>
       </table>
     </div>
@@ -382,17 +351,7 @@
     <div class="foot-brand">
       <div class="brand">
         <span class="brand-mark">
-          <svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true">
-            <defs>
-              <linearGradient id="gMarkF" x1="0" x2="1" y1="0" y2="1">
-                <stop offset="0" stop-color="#7af9ff"/>
-                <stop offset="1" stop-color="#c66bff"/>
-              </linearGradient>
-            </defs>
-            <rect x="3" y="3" width="26" height="26" rx="7" fill="none" stroke="url(#gMarkF)" stroke-width="2"/>
-            <path d="M9 16h14 M16 9v14" stroke="url(#gMarkF)" stroke-width="2" stroke-linecap="round"/>
-            <circle cx="16" cy="16" r="3" fill="url(#gMarkF)"/>
-          </svg>
+          <img src="assets/figures/logo.png" alt="TuringViT" class="brand-logo" />
         </span>
         <span class="brand-text">Turing<span class="brand-accent">ViT</span></span>
       </div>
