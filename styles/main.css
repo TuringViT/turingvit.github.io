@@ -109,10 +109,13 @@ b, strong { color: #fff; font-weight: 600; }
 
 /* ===== Nav ===== */
 .nav {
-  position: sticky; top: 0; z-index: 20;
+  position: fixed; top: 0; left: 0; right: 0; z-index: 50;
   background: rgba(8,10,20,.85);
+  -webkit-backdrop-filter: saturate(140%) blur(10px);
+  backdrop-filter: saturate(140%) blur(10px);
   border-bottom: 1px solid var(--border);
 }
+body { padding-top: 64px; }
 .nav-inner {
   max-width: var(--maxw); margin: 0 auto;
   padding: 14px var(--pad);
